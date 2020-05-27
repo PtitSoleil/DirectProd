@@ -1,17 +1,12 @@
 <?php
 /**
- * @description : Détails d'une annonce
+ * @description : Page de gestion d'annonces perso
  * @version 1.0.0
  * @since 27.05.20
  * @author Adar Güner
  */
 
- require_once __DIR__ . '/php/includes/incAll/inc.all.php';
-
- if(!isLogged()) {
-    header("Location: ./index.php");
-}
-
+    require_once __DIR__ . '/php/includes/incAll/inc.all.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -24,7 +19,7 @@
         <link rel="stylesheet" href="./css/style.css">
         <script src="https://kit.fontawesome.com/c89edac6b7.js" crossorigin="anonymous"></script>
 
-        <title>Accueil</title>
+        <title>Mes annonces</title>
     </head>
 
     <body>

@@ -12,3 +12,8 @@ require_once __DIR__ . '/../../server/database.php';
  * INCLUDE DES FONCTIONS
  */
 require_once __DIR__ . '/../function.php';
+
+/**
+ * INCLUDE DES CONSTANTES
+ */
+require_once __DIR__ . '/../constants.php';

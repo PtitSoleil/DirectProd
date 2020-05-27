@@ -12,6 +12,47 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+if(isLogged()) {
+    header("Location: ./index.php");
+}
+
+$email = "";
+$password = "";
+$errors = array();
+$errorExist = false;
+
+if (filter_has_var(INPUT_POST, 'login')) {
+
+    $email = filter_input(INPUT_POST, "email", FILTER_SANITIZE_STRING);
+    $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_STRING);
+
+
+    if(empty($email)){
+        $errorEmpty = true;
+        $errors['email'] = "L'email est vide";
+    }
+    if(empty($password)){
+        $errorEmpty = true;
+        $errors['password'] = "Le mot de passe est vide";
+    }
+
+    if(!$errorEmpty){
+        if (userVerify($email)) {
+            if (pwdVerify($email, $password)) {
+                $_SESSION['email'] = $email;
+                $_SESSION['logged'] = TRUE;
+                $_SESSION['connect'] = true;
+                $_SESSION['username'] = explode("@", $email)[0];
+                header("Location:./index.php");
+                exit;
+            } else {
+                $errors['password'] = "Mot de passe incorrect";
+            }
+        } else {
+            $errors['email'] = "Email inconnu";
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,16 +75,16 @@ if (session_status() == PHP_SESSION_NONE) {
         <form method='post' action="" class="mt-4">
             <div class="form-group">
                 <label for="email">Adresse mail</label>
-                <input type="email" value="" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Entrer votre email">
+                <input type="email" value="<?= $email ?>" class="form-control <?= !empty($errors['email']) ? 'is-invalid' : '' ?>" id="email" name="email" aria-describedby="emailHelp" placeholder="Entrer votre email">
                 <div class="invalid-feedback">
-
+                    <?= !empty($errors['email']) ? $errors['email'] : '' ?>
                 </div>
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe">
+                <input type="password" class="form-control <?= !empty($errors['password']) ? 'is-invalid' : '' ?>" id="password" name="password" placeholder="Mot de passe">
                 <div class="invalid-feedback">
-
+                    <?= !empty($errors['password']) ? $errors['password'] : '' ?>
                 </div>
             </div>
             <button type="submit" name="login" class="btn btn-primary">Se connecter</button>
