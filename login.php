@@ -20,6 +20,7 @@ $email = "";
 $password = "";
 $errors = array();
 $errorExist = false;
+$errorEmpty=false;
 
 if (filter_has_var(INPUT_POST, 'login')) {
 

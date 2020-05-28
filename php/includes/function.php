@@ -68,18 +68,20 @@ function userVerify($emailParam){
  * @param [type] $pwdParam      le mot de passe
  * @return void
  */
-function pwdVerify($emailParam, $pwdParam)
-{
+function pwdVerify($emailParam, $pwdParam){
     try {
         $password_ok = false;
 
-        $s = 'SELECT password FROM user WHERE user.email=?';
+        $s = 'SELECT * FROM user WHERE user.email=?';
         $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $statement->execute(array($emailParam));
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+        
 
         if (password_verify($pwdParam, $result["password"])) {
             $password_ok = true;
+            $_SESSION['id'] = $result['idUser'];
+            $_SESSION['admin'] = $result['isAdmin'];
         }
 
         return $password_ok;
@@ -87,4 +89,60 @@ function pwdVerify($emailParam, $pwdParam)
             die('Erreur : ' . $e->getMessage());
             return false;
         }
+}
+
+
+function createAdvert($title, $description, $organic, $isValid, $idUser, $finalFileName) {
+    $db = EDatabase::getInstance();
+    try {
+        $db->query('INSERT INTO directproddb.advertisement (title,description,organic,isValid,idUser) VALUES ("' . $title . '","' . $description . '","' . $organic . '","' . $isValid . '","' . $idUser . '")');
+        $lastInsertId = EDatabase::getInstance()->lastInsertId();
+        $db->query('INSERT INTO directproddb.picture (path,idAdvertisement) VALUES ("' . $finalFileName . '","'. $lastInsertId .'")');
+        header("Location: ./index.php");
+    } catch (PDOException $ex) {
+        echo "An Error occured!"; // user friendly message
+        error_log($ex->getMessage());
     }
+}
+
+/**
+ * Fonction qui affiche tout les annonces
+ *
+ * @return void
+ */
+function showAllAdverts()
+{
+    $db = EDatabase::getInstance();
+
+    echo '<table class="table table-striped table-hover border border-dark border-3">
+          <thead class="thead-dark">
+          <tr>
+            <th scope="col"> Image </th>
+            <th scope="col"> Titre </th>
+            <th scope="col"> Description </th>
+            <th scope="col"> Bio </th>
+          </tr>;
+          </thead>
+          <tbody>';
+
+
+    try {
+        foreach ($db->query('SELECT *
+            FROM advertisement
+            INNER JOIN picture
+            ON advertisement.idAdvertisement=picture.idAdvertisement;') as $row) {
+            echo '<tr>
+                  <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
+                  <td>' . $row['title'] . '</td> 
+                  <td>' . $row['description'] . '</td>
+                  <td>' . $row['organic'] . '</td>
+                  </tr>';
+        }
+
+    } catch (PDOException $ex) {
+        echo 'An Error occured!'; // user friendly message
+        error_log($ex->getMessage());
+    }
+
+    echo '</table>';
+}

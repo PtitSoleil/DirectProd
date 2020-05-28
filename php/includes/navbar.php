@@ -9,8 +9,16 @@
     <ul class="navbar-nav mr-auto">
     <?php if (isLogged()): ?>
     <li class="nav-item active">
-        <a class="nav-link" href="./detailsAdvert.php"> <i class="fas fa-plus"></i>Ajouter une annonce</a>
+        <a class="nav-link" href="./addAdvert.php"> <i class="fas fa-plus"></i> Ajouter une annonce</a>
       </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="./myAdvert.php"> <i class="fas fa-bars"></i> Mes annonces</a>
+      </li>
+      <?php if ($_SESSION['admin'] == ADMIN): ?>
+      <li class="nav-item active">
+        <a class="nav-link" href="./administration.php"> <i class="#"></i> Administration</a>
+        </li>
+      <?php endif; ?>
       <?php endif; ?>
     </ul>
     <ul class="navbar-nav ml-auto">
@@ -22,6 +30,9 @@
         <a class="nav-link" href="./register.php"> <i class="fas fa-user-plus"></i> Inscription</a>
       </li>
       <?php else: ?>
+      <li class="nav-item active">
+        <a class="nav-link" href="./profile.php"> <i class="#"></i> Mon profil</a>
+      </li>
       <li class="nav-item active">
         <a class="nav-link" href="./logout.php"> <i class="fas fa-sign-out-alt"></i> Déconnexion</a>
       </li>
