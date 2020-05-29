@@ -121,6 +121,9 @@ function showAllAdverts()
             <th scope="col"> Titre </th>
             <th scope="col"> Description </th>
             <th scope="col"> Bio </th>
+            <th scope="col"> Nombre avis </th>
+            <th scope="col"> Moyenne avis </th>
+            <th scope="col"> Ville / Canton </th>
           </tr>;
           </thead>
           <tbody>';
@@ -128,16 +131,77 @@ function showAllAdverts()
 
     try {
         foreach ($db->query('SELECT *
-            FROM advertisement
-            INNER JOIN picture
-            ON advertisement.idAdvertisement=picture.idAdvertisement;') as $row) {
+        FROM user s
+        INNER JOIN advertisement a
+            on s.iduser = a.iduser
+        INNER JOIN picture p
+            on a.idAdvertisement = p.idAdvertisement;') as $row) {
             echo '<tr>
                   <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
                   <td>' . $row['title'] . '</td> 
-                  <td>' . $row['description'] . '</td>
-                  <td>' . $row['organic'] . '</td>
+                  <td>' . $row['description'] . '</td>';
+                  if($row['organic'] == ORGANIC){
+                     echo '<td>Bio</td>';
+                  }else{
+                    echo '<td>Pas Bio</td>';
+                  }
+            echo '<td>' . $row['city'].' / '. $row['canton'] . '</td>
                   </tr>';
         }
+
+    } catch (PDOException $ex) {
+        echo 'An Error occured!'; // user friendly message
+        error_log($ex->getMessage());
+    }
+
+    echo '</table>';
+}
+
+/**
+ * Fonction qui affiche tout les annonces
+ *
+ * @return void
+ */
+function showMyAdverts()
+{
+    $db = EDatabase::getInstance();
+
+    echo '<table class="table table-striped table-hover border border-dark border-3">
+          <thead class="thead-dark">
+          <tr>
+            <th scope="col"> Image </th>
+            <th scope="col"> Titre </th>
+            <th scope="col"> Description </th>
+            <th scope="col"> Bio </th>
+            <th scope="col"> Nombre avis </th>
+            <th scope="col"> Moyenne avis </th>
+            <th scope="col"> Ville / Canton </th>
+          </tr>;
+          </thead>
+          <tbody>';
+
+
+    try {
+        foreach ($db->query('SELECT *
+        FROM user s
+        INNER JOIN advertisement a
+            on s.iduser = a.iduser
+        INNER JOIN picture p
+            on a.idAdvertisement = p.idAdvertisement;') as $row) {
+                if($row['idUser'] == $_SESSION['id']){
+            echo '<tr>
+                  <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
+                  <td>' . $row['title'] . '</td> 
+                  <td>' . $row['description'] . '</td>';
+                  if($row['organic'] == ORGANIC){
+                     echo '<td>Bio</td>';
+                  }else{
+                    echo '<td>Pas Bio</td>';
+                  }
+            echo '<td>' . $row['city'].' / '. $row['canton'] . '</td>
+                  </tr>';
+        }
+    }
 
     } catch (PDOException $ex) {
         echo 'An Error occured!'; // user friendly message
