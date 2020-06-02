@@ -8,13 +8,26 @@
 
  require_once __DIR__ . '/php/includes/incAll/inc.all.php';
 
- if(!isLogged()) {
-    header("Location: ./index.php");
-}
-
 $idAdvertisement = FILTER_INPUT(INPUT_GET,"idAdvertisement",FILTER_VALIDATE_INT);
 
 $advertisement = showDetailsAdvert($idAdvertisement);
+
+if (filter_has_var(INPUT_POST, 'evaluateAdvert')) {
+
+    $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_STRING);
+    $note = filter_input(INPUT_POST, 'note', FILTER_SANITIZE_NUMBER_INT);
+    $date = date('Y-m-d H:i:s');
+    $idUser = $_SESSION['id'];
+
+    if (empty($comment)) {
+        $errors["comment"] = "Le commentaire est vide";
+    }
+
+    if (empty($errors) ) {        
+        evaluateAdvert($note, $comment, $date, $idUser, $idAdvertisement);
+        
+    }
+}
 
 ?>
 <!DOCTYPE html>
@@ -33,8 +46,39 @@ $advertisement = showDetailsAdvert($idAdvertisement);
 
     <body>
         <?php include_once './php/includes/navbar.php'; ?>
-        <div class="container">
-        <?php echo $advertisement['title'] ?>
+        <div class="container border mt-5">
+            <div class="row">
+                <div class="col-sm-5">
+                    <img class="card-img-top" alt="<?php echo $advertisement['path'] ?>" src="./uploads/<?php echo $advertisement['path'] ?>">
+                </div>
+                <div class="col-sm-7">
+                    <h1 class="card-title"><?php echo $advertisement['title'] ?></h1>
+                    <p class="card-text"><?php echo $advertisement['description'] ?></p>
+                </div>
+            </div>
+            <?php if ($_SESSION['id'] !== $advertisement['idUser']): ?>
+            <div class="row">
+                <div class="col">
+                    <form method='post' action="" class="mt-4" enctype="multipart/form-data">
+                        <div class="form-group">
+                        <label for="comment">Commentaire</label>
+                        <input type="comment" class="form-control <?= !empty($errors['comment']) ? 'is-invalid' : '' ?>" id="comment" name="comment" placeholder="Entrer votre commentaire">
+                        <div class="invalid-feedback">
+                            <?= !empty($errors['comment']) ? $errors['comment'] : '' ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="note">Note</label>
+                    <input type="number" id="note" name="note" min="0" max="5">
+                    </div>
+                    <button type="submit" name="evaluateAdvert" class="btn btn-primary">Evaluer l'annonce</button>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
+            </div>
+            <div class="container border mt-2">
+            <?php showRate($idAdvertisement) ?>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">

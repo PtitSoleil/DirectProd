@@ -125,7 +125,7 @@ function showAllAdverts()
             <th scope="col"> Moyenne avis </th>
             <th scope="col"> Ville / Canton </th>
             <th scope="col"> Action </th>
-          </tr>;
+          </tr>
           </thead>
           <tbody>';
 
@@ -181,7 +181,7 @@ function showMyAdverts()
             <th scope="col"> Moyenne avis </th>
             <th scope="col"> Ville / Canton </th>
             <th scope="col"> Action </th>
-          </tr>;
+          </tr>
           </thead>
           <tbody>';
 
@@ -298,4 +298,50 @@ function showDetailsAdvert($idAdvertisement) {
         }
 
     } catch (PDOException $ex) {
-}}
+    }
+}
+
+/**
+ * Undocumented function
+ *
+ * @param [type] $note              Note de l'annonce
+ * @param [type] $comment           Son commentaire
+ * @param [type] $date              La date ou il y a évaluer l'annonce
+ * @param [type] $idUser            l'id de l'utilisateur
+ * @param [type] $idAdvertisement   l'id de l'annonce
+ * @return void
+ */
+function evaluateAdvert($note, $comment, $date, $idUser, $idAdvertisement) {
+    $db = EDatabase::getInstance();        
+    try {
+        $db->query('INSERT INTO directproddb.rate (rating,comment,date,idUser,idAdvertisement) VALUES ("' . $note . '","' . $comment . '","' . $date . '","' . $idUser . '","' . $idAdvertisement . '")');
+        header("Location: ./index.php");
+    } catch (PDOException $ex) {
+        echo "An Error occured!"; // user friendly message
+        error_log($ex->getMessage());
+    }
+}
+
+
+function showRate($idAdvertisement) {
+    $db = EDatabase::getInstance();        
+    try {
+        foreach ($db->query('SELECT r.rating, r.comment, r.idUser, r.idAdvertisement, u.email
+        FROM rate r
+        INNER JOIN user u
+            on r.iduser = u.iduser;') as $row) {
+            if($row['idAdvertisement'] == $idAdvertisement){
+                echo '<div class="row mt-1">
+                        <div class="col">
+                            <h1 class="card-title">'.explode("@", $row['email'])[0].'</h1>
+                            <p class="card-text ml-auto">'. $row["comment"].'</p>
+                            <p class="card-text mr-auto">Note : '. $row["rating"].'</p>
+                        </div>
+                       </div>';
+            }
+        }
+    } catch (PDOException $ex) {
+        echo "An Error occured!"; // user friendly message
+        error_log($ex->getMessage());
+    }
+}
