@@ -124,6 +124,7 @@ function showAllAdverts()
             <th scope="col"> Nombre avis </th>
             <th scope="col"> Moyenne avis </th>
             <th scope="col"> Ville / Canton </th>
+            <th scope="col"> Action </th>
           </tr>;
           </thead>
           <tbody>';
@@ -145,7 +146,10 @@ function showAllAdverts()
                   }else{
                     echo '<td>Pas Bio</td>';
                   }
-            echo '<td>' . $row['city'].' / '. $row['canton'] . '</td>
+            echo '<td></td>
+                  <td></td>
+                  <td>' . $row['city'].' / '. $row['canton'] . '</td>
+                  <td><a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $row['idAdvertisement'] . '"> <i class="fas fa-info-circle"></i></a></td>
                   </tr>';
         }
 
@@ -176,6 +180,7 @@ function showMyAdverts()
             <th scope="col"> Nombre avis </th>
             <th scope="col"> Moyenne avis </th>
             <th scope="col"> Ville / Canton </th>
+            <th scope="col"> Action </th>
           </tr>;
           </thead>
           <tbody>';
@@ -189,17 +194,21 @@ function showMyAdverts()
         INNER JOIN picture p
             on a.idAdvertisement = p.idAdvertisement;') as $row) {
                 if($row['idUser'] == $_SESSION['id']){
-            echo '<tr>
-                  <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
-                  <td>' . $row['title'] . '</td> 
-                  <td>' . $row['description'] . '</td>';
-                  if($row['organic'] == ORGANIC){
-                     echo '<td>Bio</td>';
-                  }else{
-                    echo '<td>Pas Bio</td>';
-                  }
-            echo '<td>' . $row['city'].' / '. $row['canton'] . '</td>
-                  </tr>';
+                    echo '<tr>
+                    <td><img class="card-img-top" alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
+                    <td>' . $row['title'] . '</td> 
+                    <td>' . $row['description'] . '</td>';
+                    if($row['organic'] == ORGANIC){
+                       echo '<td>Bio</td>';
+                    }else{
+                      echo '<td>Pas Bio</td>';
+                    }
+              echo '<td></td>
+                    <td></td>
+                    <td>' . $row['city'].' / '. $row['canton'] . '</td>
+                    <td><a class="nav-link" href="editAdvert.php?idAdvertisement='.$row['idAdvertisement'].'"> <i class="fas fa-edit"></i></a>
+                        <a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $row['idAdvertisement'] . '"> <i class="fas fa-info-circle"></i></a></td>
+                    </tr>';
         }
     }
 
@@ -210,3 +219,83 @@ function showMyAdverts()
 
     echo '</table>';
 }
+
+/**
+ * Fonction qui affiche les détails d'une annonce pour le modifier
+ *
+ * @param [type] $idAdvertisement   l'id de l'annonce
+ * @return void
+ */
+function showUpdateInfo($idAdvertisement) {
+    $db = EDatabase::getInstance();        
+    try {
+        $s = 'SELECT * FROM directproddb.advertisement WHERE idAdvertisement = :idAdvertisement';
+        $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $statement->execute(array(':idAdvertisement' => $idAdvertisement));
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if(!empty($result)){
+            return $result[0];
+        }
+
+    } catch (PDOException $ex) {
+}}
+
+/**
+ * Fonction qui modifie une annonce
+ *
+ * @param [type] $idAdvertisement   l'id de l'annonce
+ * @param [type] $title             son titre
+ * @param [type] $description       sa description 
+ * @param [type] $organic           s'il est bio ou non
+ * @param [type] $isValid           s'il est valid ou non
+ * @return void
+ */
+function updateAdvert($idAdvertisement, $title, $description, $organic, $isValid) {
+    $db = EDatabase::getInstance();
+    try {
+        $db->query('UPDATE directproddb.advertisement SET title = "'.$title.'", description = "'.$description.'", organic = "'.$organic.'", isValid = "'.$isValid.'" WHERE idAdvertisement = "'.$idAdvertisement.'"');        
+        header("Location: ./myAdvert.php");
+    } catch (PDOException $ex) {
+        echo "An Error occured!"; // user friendly message
+        error_log($ex->getMessage());
+    }}
+
+/**
+ * Fonction qui supprime une annonce
+ *
+ * @param [type] $idAdvertisement   id de l'annonce
+ * @return void
+ */
+function deleteAdvert($idAdvertisement) {
+    $db = EDatabase::getInstance();
+    try {
+        $db->query('DELETE from directproddb.picture where idAdvertisement = "'.$idAdvertisement.'"');
+        $db->query('DELETE from directproddb.advertisement where idAdvertisement = "'.$idAdvertisement.'"');
+        header("Location: ./myAdvert.php");
+    } catch (PDOException $ex) {
+        echo "An Error occured!"; // user friendly message
+        error_log($ex->getMessage());
+    }
+}
+
+/**
+ * Fonction qui affiche une annonce
+ *
+ * @param [type] $idAdvertisement
+ * @return void
+ */
+function showDetailsAdvert($idAdvertisement) {
+    $db = EDatabase::getInstance();        
+    try {
+        $s = 'SELECT * FROM user s INNER JOIN advertisement a on s.iduser = a.iduser INNER JOIN picture p on a.idAdvertisement = p.idAdvertisement WHERE a.idAdvertisement = :idAdvertisement';
+        $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $statement->execute(array(':idAdvertisement' => $idAdvertisement));
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if(!empty($result)){
+            return $result[0];
+        }
+
+    } catch (PDOException $ex) {
+}}

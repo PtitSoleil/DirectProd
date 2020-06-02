@@ -12,6 +12,10 @@
     header("Location: ./index.php");
 }
 
+$idAdvertisement = FILTER_INPUT(INPUT_GET,"idAdvertisement",FILTER_VALIDATE_INT);
+
+$advertisement = showDetailsAdvert($idAdvertisement);
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -29,7 +33,8 @@
 
     <body>
         <?php include_once './php/includes/navbar.php'; ?>
-        <div class="container mt-3">
+        <div class="container">
+        <?php echo $advertisement['title'] ?>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
