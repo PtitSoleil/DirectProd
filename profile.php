@@ -2,13 +2,21 @@
 /**
  * @description : Page de profil
  * @version 1.0.0
- * @since 27.05.20
+ * @since 03.06.20
  * @author Adar Güner
  */
 
 require_once __DIR__ . '/php/includes/incAll/inc.all.php';
 
 if(!isLogged()) {
+    header("Location: ./index.php");
+}
+
+$idUser = FILTER_INPUT(INPUT_GET, "idUser",FILTER_VALIDATE_INT);
+
+$user = showDetailsUser($idUser);
+
+if($_SESSION['id'] !== $user['idUser']){
     header("Location: ./index.php");
 }
 
@@ -29,7 +37,34 @@ if(!isLogged()) {
 
     <body>
         <?php include_once './php/includes/navbar.php'; ?>
-        <div class="container mt-3">
+
+        <div class="container mt-5 text-center">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card-header text-light text-center" style="background-color: #1e281e"><h1><?php echo $user['email'] ?></h1></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h3 class="card-title">Rue et numéro</h3>
+                                <p class="card-text"><?php echo $user['streetAndNumber'] ?></p>
+                                <h3 class="card-title">Canton</h3>
+                                <p class="card-text"><?php echo $user['canton'] ?></p>
+                            </div>
+                            <div class="col">
+                                <h3 class="card-title">Code Postal</h3>
+                                <p class="card-text"><?php echo $user['postCode'] ?></p>
+                                <h3 class="card-title">Ville</h3>
+                                <p class="card-text"><?php echo $user['city'] ?></p>
+                            </div>
+                        </div>
+                        <h3 class="card-title">Description</h3>
+                        <p class="card-text"><?php echo $user['description'] ?></p>
+                        <div class="form-group mt-2">
+                            <a href="./editProfile.php?idUser=<?php echo $_SESSION['id']?>" class="form-control btn text-light">Modifier le profil</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">

@@ -41,44 +41,73 @@ if (filter_has_var(INPUT_POST, 'evaluateAdvert')) {
         <link rel="stylesheet" href="./css/style.css">
         <script src="https://kit.fontawesome.com/c89edac6b7.js" crossorigin="anonymous"></script>
 
-        <title>Accueil</title>
+        <title>Détails annonce</title>
     </head>
 
     <body>
         <?php include_once './php/includes/navbar.php'; ?>
-        <div class="container border mt-5">
+
+        <div class="container mt-5">
             <div class="row">
-                <div class="col-sm-5">
-                    <img class="card-img-top" alt="<?php echo $advertisement['path'] ?>" src="./uploads/<?php echo $advertisement['path'] ?>">
-                </div>
-                <div class="col-sm-7">
-                    <h1 class="card-title"><?php echo $advertisement['title'] ?></h1>
-                    <p class="card-text"><?php echo $advertisement['description'] ?></p>
-                </div>
-            </div>
-            <?php if ($_SESSION['id'] !== $advertisement['idUser']): ?>
-            <div class="row">
-                <div class="col">
-                    <form method='post' action="" class="mt-4" enctype="multipart/form-data">
-                        <div class="form-group">
-                        <label for="comment">Commentaire</label>
-                        <input type="comment" class="form-control <?= !empty($errors['comment']) ? 'is-invalid' : '' ?>" id="comment" name="comment" placeholder="Entrer votre commentaire">
-                        <div class="invalid-feedback">
-                            <?= !empty($errors['comment']) ? $errors['comment'] : '' ?>
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h1><?php echo $advertisement['title'] ?></h1></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4">
+                                <img class="card-img-top" alt="<?php echo $advertisement['path'] ?>" src="./uploads/<?php echo $advertisement['path'] ?>">
+                            </div>
+                            <div class="col-8">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="description"><h4>Description</h4></label>
+                                        <p class="card-text"><?php echo $advertisement['description'] ?></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                    <label for="note">Note</label>
-                    <input type="number" id="note" name="note" min="0" max="5">
+                </div>
+            </div>  
+            <?php if (isLogged()): ?>
+            <?php if ($_SESSION['id'] !== $advertisement['idUser']):?>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Ajouter un commentaire</h4></div>
+                        <div class="card-body">
+                            <form method='post' action="">
+                                <div class="form-group">
+                                    <label for="comment">Commentaire</label>
+                                    <input type="comment" class="form-control <?= !empty($errors['comment']) ? 'is-invalid' : '' ?>" id="comment" name="comment" placeholder="Entrer votre commentaire">
+                                    <div class="invalid-feedback">
+                                        <?= !empty($errors['comment']) ? $errors['comment'] : '' ?>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="note">Note</label>
+                                    <input type="number" id="note" name="note" min="0" max="5">
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" name="evaluateAdvert" class="form-control btn text-light">Evaluer l'annonce</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <button type="submit" name="evaluateAdvert" class="btn btn-primary">Evaluer l'annonce</button>
-                    </form>
                 </div>
             </div>
             <?php endif; ?>
-            </div>
-            <div class="container border mt-2">
-            <?php showRate($idAdvertisement) ?>
+            <?php endif; ?>  
+        </div>
+
+        <div class="container mt-2">
+        <div class="row mt-2">
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Commentaire</h4></div>
+                        <div class="card-body">
+                            <?php showRate($idAdvertisement) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>   
         </div>
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">

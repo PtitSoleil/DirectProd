@@ -2,7 +2,7 @@
 /**
  * @description : Page d'administration'
  * @version 1.0.0
- * @since 27.05.20
+ * @since 03.06.20
  * @author Adar Güner
  */
 
@@ -23,7 +23,7 @@ if(!isLogged()) {
         <link rel="stylesheet" href="./css/style.css">
         <script src="https://kit.fontawesome.com/c89edac6b7.js" crossorigin="anonymous"></script>
 
-        <title>Profil</title>
+        <title>Administration</title>
     </head>
 
     <body>

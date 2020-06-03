@@ -2,7 +2,7 @@
 /**
  * @description : login
  * @version 1.0.0
- * @since 26.05.20
+ * @since 03.06.20
  * @author Adar Güner
  */
 
@@ -65,31 +65,41 @@ if (filter_has_var(INPUT_POST, 'login')) {
     <title>Login</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/style.min.css">
+    <link rel="stylesheet" href="./css/style.css">
     <script src="https://kit.fontawesome.com/c89edac6b7.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-<?php include_once './php/includes/navbar.php'; ?>
+    <?php include_once './php/includes/navbar.php'; ?>
 
-    <div class="m-auto w-50">
-        <form method='post' action="" class="mt-4">
-            <div class="form-group">
-                <label for="email">Adresse mail</label>
-                <input type="email" value="<?= $email ?>" class="form-control <?= !empty($errors['email']) ? 'is-invalid' : '' ?>" id="email" name="email" aria-describedby="emailHelp" placeholder="Entrer votre email">
-                <div class="invalid-feedback">
-                    <?= !empty($errors['email']) ? $errors['email'] : '' ?>
+    <div class="container mt-5">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Connexion</h4></div>
+                    <div class="card-body">
+                        <form method='post' action="">
+                            <div class="form-group">
+                                <label for="email"><h5>Adresse mail</h5></label>
+                                <input type="email" value="<?= $email ?>" class="form-control <?= !empty($errors['email']) ? 'is-invalid' : '' ?>" id="email" name="email" aria-describedby="emailHelp" placeholder="Entrer votre email">
+                                <div class="invalid-feedback">
+                                    <?= !empty($errors['email']) ? $errors['email'] : '' ?>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password"><h5>Mot de passe</h5></label>
+                                <input type="password" class="form-control <?= !empty($errors['password']) ? 'is-invalid' : '' ?>" id="password" name="password" placeholder="Mot de passe">
+                                <div class="invalid-feedback">
+                                    <?= !empty($errors['password']) ? $errors['password'] : '' ?>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" name="login" class="form-control btn text-light">Se connecter</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" class="form-control <?= !empty($errors['password']) ? 'is-invalid' : '' ?>" id="password" name="password" placeholder="Mot de passe">
-                <div class="invalid-feedback">
-                    <?= !empty($errors['password']) ? $errors['password'] : '' ?>
-                </div>
-            </div>
-            <button type="submit" name="login" class="btn btn-primary">Se connecter</button>
-        </form>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>

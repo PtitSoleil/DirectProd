@@ -2,7 +2,7 @@
 /**
  * @description : Page d'accueil
  * @version 1.0.0
- * @since 28.05.20
+ * @since 03.06.20
  * @author Adar Güner
  */
 
@@ -65,41 +65,49 @@ if (filter_has_var(INPUT_POST, 'deleteAdvert')) {
         <link rel="stylesheet" href="./css/style.css">
         <script src="https://kit.fontawesome.com/c89edac6b7.js" crossorigin="anonymous"></script>
 
-        <title>Accueil</title>
+        <title>Modifier annonce</title>
     </head>
 
     <body>
         <?php include_once './php/includes/navbar.php'; ?>
-
-        <div class="m-auto w-50">
-        <form method='post' action="" class="mt-4" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="title">Titre</label>
-                <input type="title" class="form-control <?= !empty($errors['title']) ? 'is-invalid' : '' ?>" value="<?php echo $advertisement['title'] ?>" id="title" name="title" placeholder="Entrer un titre">
-                <div class="invalid-feedback">
-                    <?= !empty($errors['title']) ? $errors['title'] : '' ?>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Modifier l'annonce</h4></div>
+                        <div class="card-body">
+                            <form method='post' action="" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="title">Titre</label>
+                                    <input type="title" class="form-control <?= !empty($errors['title']) ? 'is-invalid' : '' ?>" value="<?php echo $advertisement['title'] ?>" id="title" name="title" placeholder="Entrer un titre">
+                                    <div class="invalid-feedback">
+                                        <?= !empty($errors['title']) ? $errors['title'] : '' ?>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea class="form-control <?= !empty($errors['description']) ? 'is-invalid' : '' ?>" aria-label="With textarea" id="description" name="description" placeholder="Description" ><?php echo $advertisement['description'] ?></textarea>
+                                    <div class="invalid-feedback">
+                                        <?= !empty($errors['description']) ? $errors['description'] : '' ?>
+                                    </div>
+                                </div>
+                                <div class="form-check">
+                                    <?php if ($advertisement['organic'] == ORGANIC): ?>
+                                    <input type="checkbox" class="form-check-input" id="organic" name="organic" checked>
+                                    <?php else: ?>
+                                    <input type="checkbox" class="form-check-input" id="organic" name="organic">
+                                    <?php endif; ?>
+                                    <label class="form-check-label" for="organic">Bio</label>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" name="modifyAdvert" class="form-control btn text-light">Modifier l'annonce</button>
+                                    <button type="submit" name="deleteAdvert" class="form-control btn-danger btn text-light">Supprimer l'annonce</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea class="form-control <?= !empty($errors['description']) ? 'is-invalid' : '' ?>" aria-label="With textarea" id="description" name="description" placeholder="Description" ><?php echo $advertisement['description'] ?></textarea>
-                <div class="invalid-feedback">
-                    <?= !empty($errors['description']) ? $errors['description'] : '' ?>
-                </div>
-            </div>
-            <div class="form-check">
-            <?php if ($advertisement['organic'] == ORGANIC): ?>
-                <input type="checkbox" class="form-check-input" id="organic" name="organic" checked>
-            <?php else: ?>
-                    <input type="checkbox" class="form-check-input" id="organic" name="organic">
-            <?php endif; ?>
-                <label class="form-check-label" for="organic">Bio</label>
-            </div>
-            <button type="submit" name="modifyAdvert" class="btn btn-primary">Modifier l'annonce</button>
-            <button type="submit" name="deleteAdvert" class="btn btn-danger">Supprimer l'annonce</button>
-        </form>
         </div>
-
         
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
         </script>

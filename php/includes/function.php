@@ -114,13 +114,13 @@ function showAllAdverts()
 {
     $db = EDatabase::getInstance();
 
-    echo '<table class="table table-striped table-hover border border-dark border-3">
-          <thead class="thead-dark">
-          <tr>
+    echo '<table class="table">
+          <thead style="background-color: #1e281e">
+          <tr class="text-light">
             <th scope="col"> Image </th>
             <th scope="col"> Titre </th>
             <th scope="col"> Description </th>
-            <th scope="col"> Bio </th>
+            <th scope="col"> Etat </th>
             <th scope="col"> Nombre avis </th>
             <th scope="col"> Moyenne avis </th>
             <th scope="col"> Ville / Canton </th>
@@ -171,12 +171,12 @@ function showMyAdverts()
     $db = EDatabase::getInstance();
 
     echo '<table class="table table-striped table-hover border border-dark border-3">
-          <thead class="thead-dark">
-          <tr>
+          <thead style="background-color: #1e281e">
+          <tr class="text-light">
             <th scope="col"> Image </th>
             <th scope="col"> Titre </th>
             <th scope="col"> Description </th>
-            <th scope="col"> Bio </th>
+            <th scope="col"> Etat </th>
             <th scope="col"> Nombre avis </th>
             <th scope="col"> Moyenne avis </th>
             <th scope="col"> Ville / Canton </th>
@@ -302,7 +302,7 @@ function showDetailsAdvert($idAdvertisement) {
 }
 
 /**
- * Undocumented function
+ * Fonctio qui créer un avis pour une annonce
  *
  * @param [type] $note              Note de l'annonce
  * @param [type] $comment           Son commentaire
@@ -322,7 +322,12 @@ function evaluateAdvert($note, $comment, $date, $idUser, $idAdvertisement) {
     }
 }
 
-
+/**
+ * Fonction qui affiche les avis
+ *
+ * @param [type] $idAdvertisement
+ * @return void
+ */
 function showRate($idAdvertisement) {
     $db = EDatabase::getInstance();        
     try {
@@ -331,9 +336,9 @@ function showRate($idAdvertisement) {
         INNER JOIN user u
             on r.iduser = u.iduser;') as $row) {
             if($row['idAdvertisement'] == $idAdvertisement){
-                echo '<div class="row mt-1">
+                echo '<div class="row mb-1" style="border-bottom: 1px solid #1e281e;">
                         <div class="col">
-                            <h1 class="card-title">'.explode("@", $row['email'])[0].'</h1>
+                            <label for="userComment"><h5>'.explode("@", $row['email'])[0].'</h5></label>   
                             <p class="card-text ml-auto">'. $row["comment"].'</p>
                             <p class="card-text mr-auto">Note : '. $row["rating"].'</p>
                         </div>
@@ -345,3 +350,47 @@ function showRate($idAdvertisement) {
         error_log($ex->getMessage());
     }
 }
+
+/**
+ * Fonction qui affiche les détails de l'utilisateur
+ *
+ * @param [type] $idUser   l'id de l'utilisateur
+ * @return void
+ */
+function showDetailsUser($idUser) {
+    $db = EDatabase::getInstance();        
+    try {
+        $s = 'SELECT * FROM directproddb.user WHERE idUser = :idUser';
+        $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $statement->execute(array(':idUser' => $idUser));
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if(!empty($result)){
+            return $result[0];
+        }
+
+    } catch (PDOException $ex) {
+}}
+
+/**
+ * Modifie un utilisateur dans la base
+ *
+ * @param [type] $password          Le mot de passe
+ * @param [type] $email             L'addresse email
+ * @param [type] $city              La ville
+ * @param [type] $canton            Le canton
+ * @param [type] $postCode          Le code postal
+ * @param [type] $streetAndNumber   La rue et le numéro
+ * @param [type] $isAdmin           Son rôle
+ * @param [type] $description       Sa description
+ * @return void
+ */
+function updateUser($password, $email, $city, $canton, $postCode, $streetAndNumber, $isAdmin, $description, $idUser) {
+    $db = EDatabase::getInstance();
+    try {
+        $db->query('UPDATE directproddb.user SET password = "'.$password.'", email = "'.$email.'", canton = "'.$canton.'", postCode = "'.$postCode.'", streetAndNumber = "'.$streetAndNumber.'", isAdmin = "'.$isAdmin.'", description = "'.$description.'" WHERE idUser = "'.$idUser.'"');        
+        header("Location: ./profile.php");
+    } catch (PDOException $ex) {
+        echo "An Error occured!"; // user friendly message
+        error_log($ex->getMessage());
+    }}

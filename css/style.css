@@ -1,0 +1,16 @@
+.card-body{
+    border: 1px solid #1e281e;
+}
+
+
+.form-control.btn{
+    background-color: #1e281e
+}
+
+.form-control.btn-danger.btn{
+    background-color: #c81e32
+}
+
+table{
+    border: 1px solid #1e281e;
+}
