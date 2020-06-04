@@ -27,7 +27,7 @@ if (filter_has_var(INPUT_POST, 'modifyAdvert')) {
     $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING);
     $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
     $organic = NOT_ORGANIC;
-    $isValid = VALID;
+    $isValid = INVALID;
 
     if (empty($title)) {
         $errors["title"] = "Le titre est vide";

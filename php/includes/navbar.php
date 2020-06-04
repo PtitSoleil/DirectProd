@@ -30,7 +30,7 @@
         </li>
         <?php if ($_SESSION['admin'] == ADMIN): ?>
           <li class="nav-item active">
-            <a class="nav-link text-light" href="./administration.php"> <i class="#"></i> Administration</a>
+            <a class="nav-link text-light" href="./administration.php"> <i class="fas fa-users-cog"></i> Administration</a>
           </li>
         <?php endif; ?>
         <li class="nav-item active dropdown">

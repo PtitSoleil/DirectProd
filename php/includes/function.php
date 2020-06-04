@@ -106,7 +106,7 @@ function createAdvert($title, $description, $organic, $isValid, $idUser, $finalF
 }
 
 /**
- * Fonction qui affiche tout les annonces
+ * Fonction qui affiche tout les annonces validés
  *
  * @return void
  */
@@ -114,7 +114,7 @@ function showAllAdverts()
 {
     $db = EDatabase::getInstance();
 
-    echo '<table class="table">
+    echo '<table class="table text-center">
           <thead style="background-color: #1e281e">
           <tr class="text-light">
             <th scope="col"> Image </th>
@@ -131,12 +131,13 @@ function showAllAdverts()
 
 
     try {
-        foreach ($db->query('SELECT *
-        FROM user s
+        foreach ($db->query('SELECT p.path, a.title, a.description, a.organic, u.canton, u.city, a.idAdvertisement
+        FROM user u
         INNER JOIN advertisement a
-            on s.iduser = a.iduser
+            on u.iduser = a.iduser
         INNER JOIN picture p
-            on a.idAdvertisement = p.idAdvertisement;') as $row) {
+            on a.idAdvertisement = p.idAdvertisement WHERE a.isValid = 2
+            ORDER BY a.title ASC;') as $row) {
             echo '<tr>
                   <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
                   <td>' . $row['title'] . '</td> 
@@ -170,7 +171,7 @@ function showMyAdverts()
 {
     $db = EDatabase::getInstance();
 
-    echo '<table class="table table-striped table-hover border border-dark border-3">
+    echo '<table class="table text-center">
           <thead style="background-color: #1e281e">
           <tr class="text-light">
             <th scope="col"> Image </th>
@@ -187,12 +188,13 @@ function showMyAdverts()
 
 
     try {
-        foreach ($db->query('SELECT *
-        FROM user s
+        foreach ($db->query('SELECT p.path, a.title, a.description, a.organic, u.canton, u.city, a.idAdvertisement, u.idUser
+        FROM user u
         INNER JOIN advertisement a
-            on s.iduser = a.iduser
+            on u.iduser = a.iduser
         INNER JOIN picture p
-            on a.idAdvertisement = p.idAdvertisement;') as $row) {
+            on a.idAdvertisement = p.idAdvertisement
+            ORDER BY a.title ASC;') as $row) {
                 if($row['idUser'] == $_SESSION['id']){
                     echo '<tr>
                     <td><img class="card-img-top" alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
@@ -229,7 +231,7 @@ function showMyAdverts()
 function showUpdateInfo($idAdvertisement) {
     $db = EDatabase::getInstance();        
     try {
-        $s = 'SELECT * FROM directproddb.advertisement WHERE idAdvertisement = :idAdvertisement';
+        $s = 'SELECT idAdvertisement, title, description, organic, isValid, idUser FROM directproddb.advertisement WHERE idAdvertisement = :idAdvertisement';
         $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $statement->execute(array(':idAdvertisement' => $idAdvertisement));
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -360,7 +362,7 @@ function showRate($idAdvertisement) {
 function showDetailsUser($idUser) {
     $db = EDatabase::getInstance();        
     try {
-        $s = 'SELECT * FROM directproddb.user WHERE idUser = :idUser';
+        $s = 'SELECT idUser, password, email, city, canton, streetAndNumber, postCode, description FROM directproddb.user WHERE idUser = :idUser';
         $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $statement->execute(array(':idUser' => $idUser));
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -389,8 +391,208 @@ function updateUser($password, $email, $city, $canton, $postCode, $streetAndNumb
     $db = EDatabase::getInstance();
     try {
         $db->query('UPDATE directproddb.user SET password = "'.$password.'", email = "'.$email.'", canton = "'.$canton.'", postCode = "'.$postCode.'", streetAndNumber = "'.$streetAndNumber.'", isAdmin = "'.$isAdmin.'", description = "'.$description.'" WHERE idUser = "'.$idUser.'"');        
-        header("Location: ./profile.php");
+        header("Location: ./profile.php?idUser=".$idUser);
     } catch (PDOException $ex) {
         echo "An Error occured!"; // user friendly message
         error_log($ex->getMessage());
     }}
+
+/**
+ * Fonction qui affiche les annonces recherchés
+ *
+ * @return void
+ */
+function researchAdvert($word)
+{
+    $db = EDatabase::getInstance();
+    try {
+        $s = 'SELECT p.path, a.title, a.description, a.organic, u.canton, u.city, a.idAdvertisement, u.idUser
+        FROM user u
+        INNER JOIN advertisement a
+            on u.iduser = a.iduser
+        INNER JOIN picture p
+            on a.idAdvertisement = p.idAdvertisement
+		WHERE isValid = 2
+        AND (a.title LIKE :word
+		OR a.description LIKE :word
+        OR u.canton LIKE :word
+        OR u.city LIKE :word)
+        ORDER BY a.title ASC';
+        $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $statement->execute(array(':word' => "%".$word."%"));
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if(!empty($result)){
+            return $result;
+        }
+    } catch (PDOException $ex) {
+        echo 'An Error occured!'; // user friendly message
+        error_log($ex->getMessage());
+    }
+}
+
+/**
+ * Fonction qui affiche tout les annonces
+ *
+ * @return void
+ */
+function showResearchAdvert($word)
+{
+    $research = researchAdvert($word);
+
+    if(!empty($research)){
+    echo '<table class="table text-center">
+    <thead style="background-color: #1e281e">
+    <tr class="text-light">
+      <th scope="col"> Image </th>
+      <th scope="col"> Titre </th>
+      <th scope="col"> Description </th>
+      <th scope="col"> Etat </th>
+      <th scope="col"> Nombre avis </th>
+      <th scope="col"> Moyenne avis </th>
+      <th scope="col"> Ville / Canton </th>
+      <th scope="col"> Action </th>
+    </tr>
+    </thead>
+    <tbody>';
+
+    
+    
+    foreach ($research as $r){
+        echo '<tr>
+                  <td><img class="card-img-top"alt="' . $r['path'] . '" src="./uploads/' . $r['path'] . '"></td> 
+                  <td>' . $r['title'] . '</td> 
+                  <td>' . $r['description'] . '</td>';
+                  if($r['organic'] == ORGANIC){
+                     echo '<td>Bio</td>';
+                  }else{
+                    echo '<td>Pas Bio</td>';
+                  }
+            echo '<td></td>
+                  <td></td>
+                  <td>' . $r['city'].' / '. $r['canton'] . '</td>
+                  <td><a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $r['idAdvertisement'] . '"> <i class="fas fa-info-circle"></i></a></td>
+                  </tr>';
+        }
+        }
+        else{
+            echo '<h1>Aucun résultat</h1>';
+        }
+    }
+
+/**
+ * Fonction qui affiche tout les annonces non-validés
+ *
+ * @return void
+ */
+function showAllAdvertsNotValid()
+{
+    $db = EDatabase::getInstance();
+
+    echo '<table class="table text-center">
+          <thead style="background-color: #1e281e">
+          <tr class="text-light">
+            <th scope="col"> Image </th>
+            <th scope="col"> Titre </th>
+            <th scope="col"> Description </th>
+            <th scope="col"> Etat </th>
+            <th scope="col"> Ville / Canton </th>
+            <th scope="col"> Validation </th>
+          </tr>
+          </thead>
+          <tbody>';
+
+
+    try {
+        foreach ($db->query('SELECT p.path, a.title, a.description, a.organic, u.canton, u.city, a.idAdvertisement
+        FROM user u
+        INNER JOIN advertisement a
+            on u.iduser = a.iduser
+        INNER JOIN picture p
+            on a.idAdvertisement = p.idAdvertisement WHERE a.isValid = 1;') as $row) {
+            echo '<tr>
+                  <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
+                  <td>' . $row['title'] . '</td> 
+                  <td>' . $row['description'] . '</td>';
+                  if($row['organic'] == ORGANIC){
+                     echo '<td>Bio</td>';
+                  }else{
+                    echo '<td>Pas Bio</td>';
+                  }
+            echo '<td>' . $row['city'].' / '. $row['canton'] . '</td>
+                  <td>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="isValid" name="isValid">
+                    </div>
+                  </td>
+                  </tr>';
+        }
+
+    } catch (PDOException $ex) {
+        echo 'An Error occured!'; // user friendly message
+        error_log($ex->getMessage());
+    }
+
+    echo '</table>';
+}
+
+/**
+ * Fonction qui affiche tout les annonces non-validés
+ *
+ * @return void
+ */
+function showAllUsers()
+{
+    $db = EDatabase::getInstance();
+
+    echo '<table class="table text-center">
+          <thead style="background-color: #1e281e">
+          <tr class="text-light">
+            <th scope="col"> Email </th>
+            <th scope="col"> Description </th>
+            <th scope="col"> Admin </th>
+          </tr>
+          </thead>
+          <tbody>';
+
+
+    try {
+        foreach ($db->query('SELECT idUser, email, description, isAdmin FROM user;') as $row) {
+            echo '<tr>
+                  <td>' . $row['email'] . '</td> 
+                  <td>' . $row['description'] . '</td>';
+                  if($row['isAdmin'] == ADMIN){
+                    echo '<td><input type="radio" name="isAdmin'.$row['idUser'].'" checked ></td>';
+                     }else{
+                   echo '<td><input type="radio" name="isAdmin'.$row['idUser'].'"></td>';
+                 }
+                  echo '</tr>';
+        }
+
+    } catch (PDOException $ex) {
+        echo 'An Error occured!'; // user friendly message
+        error_log($ex->getMessage());
+    }
+
+    echo '</table>';
+}
+
+function validedAdvert($idAdvertisement, $isValid) {
+    $db = EDatabase::getInstance();
+    try {
+        $db->query('UPDATE directproddb.advertisement SET isValid = "'.$isValid.'" WHERE idAdvertisement = "'.$idAdvertisement.'"');        
+        header("Location: ./administration.php");
+    } catch (PDOException $ex) {
+        echo "An Error occured!"; // user friendly message
+        error_log($ex->getMessage());
+}}
+
+
+function updatePrivilegeUser($idUser, $isAdmin) {
+        $db = EDatabase::getInstance();
+        try {
+
+        } catch (PDOException $ex) {
+            echo "An Error occured!"; // user friendly message
+            error_log($ex->getMessage());
+}}

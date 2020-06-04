@@ -17,7 +17,7 @@ if (filter_has_var(INPUT_POST, 'createAdvert')) {
     $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING);
     $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
     $organic = NOT_ORGANIC;
-    $isValid = VALID;
+    $isValid = INVALID;
     $idUser = $_SESSION['id'];
     $fichiers = $_FILES['imgFile'];
 

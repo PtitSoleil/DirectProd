@@ -6,7 +6,17 @@
  * @author Adar Güner
  */
 
-    require_once __DIR__ . '/php/includes/incAll/inc.all.php';
+require_once __DIR__ . '/php/includes/incAll/inc.all.php';
+
+$word = "";
+
+if (filter_has_var(INPUT_POST, 'word')) {
+
+    $word = filter_input(INPUT_POST, 'word', FILTER_SANITIZE_STRING);
+
+    $research = researchAdvert($word);
+        
+    }
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -29,19 +39,11 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card-header text-light" style="background-color: #1e281e"><h4>Rechercher une annonce</h4></div>
-                    <div class="card-body">
-                        <form method="post">
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col">
-                                        <label for="title"><h5>Titre :</h5></label>
-                                        <input type="title" class="form-control <?= !empty($errors['title']) ? 'is-invalid' : '' ?>" id="title" name="title" placeholder="Entrer un titre">
-                                        <div class="invalid-feedback">
-                                            <?= !empty($errors['title']) ? $errors['title'] : '' ?>
-                                        </div>
-                                        <div class="invalid-feedback"></div>
-                                        </div>
-                                    </div>
+                        <div class="card-body">
+                            <form method='post' action="">
+                                <div class="form-group">
+                                    <label for="title"><h5>Mot-Clé :</h5></label>
+                                    <input type="title" class="form-control <?= !empty($errors['word']) ? 'is-invalid' : '' ?>" id="word" name="word" placeholder="Entrer un mot-clé">
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" name="research" class="form-control btn text-light">Rechercher</button>
@@ -52,6 +54,15 @@
                 </div>
             </div>
         </div>
+
+        <div class="container mt-2 text-center">
+            <?php if($word !== ""){
+                showResearchAdvert($word);
+                }
+            ?>
+        </div>
+
+
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
         </script>

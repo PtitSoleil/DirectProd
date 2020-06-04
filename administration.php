@@ -11,6 +11,17 @@
 if(!isLogged()) {
     header("Location: ./index.php");
 }
+
+if(isset($_POST['isValid'])){
+
+    $idAdvertisement=saluz;
+    $isValid = VALID;
+
+    //validedAdvert($idAdvertisement, $isValid);
+
+    echo "SALUT";
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -28,7 +39,24 @@ if(!isLogged()) {
 
     <body>
         <?php include_once './php/includes/navbar.php'; ?>
-        <div class="container mt-3">
+
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Gestion des annonces et utilisateurs</h4></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <?php showAllAdvertsNotValid() ?>
+                                </div>
+                                <div class="col-6">
+                                    <?php showAllUsers() ?>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
