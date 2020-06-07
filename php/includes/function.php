@@ -2,7 +2,7 @@
 /**
  * @description : fichier des fonctions
  * @version 1.0.0
- * @since 26.05.20
+ * @since 05.06.20
  * @author Adar Güner
  */
 
@@ -92,6 +92,17 @@ function pwdVerify($emailParam, $pwdParam){
 }
 
 
+/**
+ * Fonction qui ajoute une annonce dans la base
+ *
+ * @param [type] $title             titre de l'annonce
+ * @param [type] $description       sa description
+ * @param [type] $organic           s'il est bio ou non
+ * @param [type] $isValid           s'il est validé ou non
+ * @param [type] $idUser            id de l'utilisateur qui a ajouté l'annonce
+ * @param [type] $finalFileName     nom de l'image
+ * @return void
+ */
 function createAdvert($title, $description, $organic, $isValid, $idUser, $finalFileName) {
     $db = EDatabase::getInstance();
     try {
@@ -114,9 +125,9 @@ function showAllAdverts()
 {
     $db = EDatabase::getInstance();
 
-    echo '<table class="table text-center">
-          <thead style="background-color: #1e281e">
-          <tr class="text-light">
+    echo '<table class="table table-hover">
+          <thead>
+          <tr>
             <th scope="col"> Image </th>
             <th scope="col"> Titre </th>
             <th scope="col"> Description </th>
@@ -139,7 +150,7 @@ function showAllAdverts()
             on a.idAdvertisement = p.idAdvertisement WHERE a.isValid = 2
             ORDER BY a.title ASC;') as $row) {
             echo '<tr>
-                  <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
+                  <td style="width: 250px;"><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
                   <td>' . $row['title'] . '</td> 
                   <td>' . $row['description'] . '</td>';
                   if($row['organic'] == ORGANIC){
@@ -147,10 +158,10 @@ function showAllAdverts()
                   }else{
                     echo '<td>Pas Bio</td>';
                   }
-            echo '<td></td>
-                  <td></td>
+            echo '<td>'.getRateNumber($row['idAdvertisement']).'</td>
+                  <td>'.getRatesMoyenne($row['idAdvertisement']).'/5</td>
                   <td>' . $row['city'].' / '. $row['canton'] . '</td>
-                  <td><a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $row['idAdvertisement'] . '"> <i class="fas fa-info-circle"></i></a></td>
+                  <td><a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $row['idAdvertisement'] . '"> <i class="fas fa-info-circle" style="color: #1e281e;"></i></a></td>
                   </tr>';
         }
 
@@ -159,11 +170,11 @@ function showAllAdverts()
         error_log($ex->getMessage());
     }
 
-    echo '</table>';
+    echo '<tbody></table>';
 }
 
 /**
- * Fonction qui affiche tout les annonces
+ * Fonction qui affiche tout les annonces personnelles
  *
  * @return void
  */
@@ -171,9 +182,9 @@ function showMyAdverts()
 {
     $db = EDatabase::getInstance();
 
-    echo '<table class="table text-center">
-          <thead style="background-color: #1e281e">
-          <tr class="text-light">
+    echo '<table class="table table-hover">
+          <thead>
+          <tr>
             <th scope="col"> Image </th>
             <th scope="col"> Titre </th>
             <th scope="col"> Description </th>
@@ -197,7 +208,7 @@ function showMyAdverts()
             ORDER BY a.title ASC;') as $row) {
                 if($row['idUser'] == $_SESSION['id']){
                     echo '<tr>
-                    <td><img class="card-img-top" alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
+                    <td style="width: 250px;"><img class="card-img-top" alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
                     <td>' . $row['title'] . '</td> 
                     <td>' . $row['description'] . '</td>';
                     if($row['organic'] == ORGANIC){
@@ -205,11 +216,11 @@ function showMyAdverts()
                     }else{
                       echo '<td>Pas Bio</td>';
                     }
-              echo '<td></td>
-                    <td></td>
+              echo '<td>'.getRateNumber($row['idAdvertisement']).'</td>
+                    <td>'.getRatesMoyenne($row['idAdvertisement']).'/5</td>
                     <td>' . $row['city'].' / '. $row['canton'] . '</td>
-                    <td><a class="nav-link" href="editAdvert.php?idAdvertisement='.$row['idAdvertisement'].'"> <i class="fas fa-edit"></i></a>
-                        <a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $row['idAdvertisement'] . '"> <i class="fas fa-info-circle"></i></a></td>
+                    <td><a class="nav-link" href="editAdvert.php?idAdvertisement='.$row['idAdvertisement'].'"> <i class="fas fa-edit" style="color: #1e281e;"></i></a>
+                        <a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $row['idAdvertisement'] . '"> <i class="fas fa-info-circle" style="color: #1e281e;"></i></a></td>
                     </tr>';
         }
     }
@@ -219,7 +230,7 @@ function showMyAdverts()
         error_log($ex->getMessage());
     }
 
-    echo '</table>';
+    echo '<tbody></table>';
 }
 
 /**
@@ -231,7 +242,10 @@ function showMyAdverts()
 function showUpdateInfo($idAdvertisement) {
     $db = EDatabase::getInstance();        
     try {
-        $s = 'SELECT idAdvertisement, title, description, organic, isValid, idUser FROM directproddb.advertisement WHERE idAdvertisement = :idAdvertisement';
+        $s = 'SELECT p.path, a.title, a.description, a.organic, a.idAdvertisement, a.idUser
+        FROM advertisement a
+        INNER JOIN picture p
+            on a.idAdvertisement = p.idAdvertisement WHERE a.idAdvertisement = :idAdvertisement';
         $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $statement->execute(array(':idAdvertisement' => $idAdvertisement));
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -246,17 +260,19 @@ function showUpdateInfo($idAdvertisement) {
 /**
  * Fonction qui modifie une annonce
  *
- * @param [type] $idAdvertisement   l'id de l'annonce
+ * @param [type] $idAdvertisement   id de l'annonce
  * @param [type] $title             son titre
- * @param [type] $description       sa description 
+ * @param [type] $description       sa description
  * @param [type] $organic           s'il est bio ou non
- * @param [type] $isValid           s'il est valid ou non
+ * @param [type] $isValid           s'il est valide ou non
+ * @param [type] $finalFileName     le nom de l'image de l'annonce
  * @return void
  */
-function updateAdvert($idAdvertisement, $title, $description, $organic, $isValid) {
+function updateAdvert($idAdvertisement, $title, $description, $organic, $isValid, $finalFileName) {
     $db = EDatabase::getInstance();
     try {
-        $db->query('UPDATE directproddb.advertisement SET title = "'.$title.'", description = "'.$description.'", organic = "'.$organic.'", isValid = "'.$isValid.'" WHERE idAdvertisement = "'.$idAdvertisement.'"');        
+        $db->query('UPDATE directproddb.advertisement SET title = "'.$title.'", description = "'.$description.'", organic = "'.$organic.'", isValid = "'.$isValid.'" WHERE idAdvertisement = "'.$idAdvertisement.'"');   
+        $db->query('UPDATE directproddb.picture SET path = "'.$finalFileName.'" WHERE idAdvertisement = "'.$idAdvertisement.'"');     
         header("Location: ./myAdvert.php");
     } catch (PDOException $ex) {
         echo "An Error occured!"; // user friendly message
@@ -273,6 +289,7 @@ function deleteAdvert($idAdvertisement) {
     $db = EDatabase::getInstance();
     try {
         $db->query('DELETE from directproddb.picture where idAdvertisement = "'.$idAdvertisement.'"');
+        $db->query('DELETE from directproddb.rate where idAdvertisement = "'.$idAdvertisement.'"');
         $db->query('DELETE from directproddb.advertisement where idAdvertisement = "'.$idAdvertisement.'"');
         header("Location: ./myAdvert.php");
     } catch (PDOException $ex) {
@@ -284,7 +301,7 @@ function deleteAdvert($idAdvertisement) {
 /**
  * Fonction qui affiche une annonce
  *
- * @param [type] $idAdvertisement
+ * @param [type] $idAdvertisement   id de l'annonce
  * @return void
  */
 function showDetailsAdvert($idAdvertisement) {
@@ -327,22 +344,25 @@ function evaluateAdvert($note, $comment, $date, $idUser, $idAdvertisement) {
 /**
  * Fonction qui affiche les avis
  *
- * @param [type] $idAdvertisement
+ * @param [type] $idAdvertisement   id de l'annonce
  * @return void
  */
-function showRate($idAdvertisement) {
+function showRates($idAdvertisement) {
     $db = EDatabase::getInstance();        
     try {
-        foreach ($db->query('SELECT r.rating, r.comment, r.idUser, r.idAdvertisement, u.email
+        foreach ($db->query('SELECT r.rating, r.comment, r.date, r.idUser, r.idAdvertisement, u.email
         FROM rate r
         INNER JOIN user u
             on r.iduser = u.iduser;') as $row) {
             if($row['idAdvertisement'] == $idAdvertisement){
                 echo '<div class="row mb-1" style="border-bottom: 1px solid #1e281e;">
-                        <div class="col">
-                            <label for="userComment"><h5>'.explode("@", $row['email'])[0].'</h5></label>   
+                        <div class="col-10">
+                            <h4>'.explode("@", $row['email'])[0].'</h4>  
                             <p class="card-text ml-auto">'. $row["comment"].'</p>
                             <p class="card-text mr-auto">Note : '. $row["rating"].'</p>
+                        </div>
+                        <div class="col-2">
+                        <p class="card-text ml-auto">'. $row["date"].'</p>
                         </div>
                        </div>';
             }
@@ -351,6 +371,60 @@ function showRate($idAdvertisement) {
         echo "An Error occured!"; // user friendly message
         error_log($ex->getMessage());
     }
+}
+
+/**
+ * Fonction qui permet d'avoir le nombre d'avis d'une annonce
+ *
+ * @param [type] $idAdvertisement   id de l'annonce
+ * @return void
+ */
+function getRateNumber($idAdvertisement)
+{
+    $db = EDatabase::getInstance();    
+    $s = 'SELECT rating FROM rate WHERE idAdvertisement = :idAdvertisement';
+    $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $statement->execute(array(':idAdvertisement' => $idAdvertisement));
+    $result = $statement->rowCount();
+    return $result;
+}
+
+/**
+ * Fonction qui permet d'avoir tout les avis d'une annonce
+ *
+ * @param [type] $idAdvertisement   id de l'annonce
+ * @return void
+ */
+function getAllAdvertRate($idAdvertisement)
+{
+    $db = EDatabase::getInstance();    
+    $s = 'SELECT rating FROM rate WHERE idAdvertisement = :idAdvertisement';
+    $statement = EDatabase::prepare($s, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $statement->execute(array(':idAdvertisement' => $idAdvertisement));
+    $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+    return $result;
+}
+
+/**
+ * Fonction qui permet d'avoir la moyenne d'une annonce
+ *
+ * @param [type] $idAdvertisement   id de l'annonce
+ * @return void
+ */
+function getRatesMoyenne($idAdvertisement)
+{
+    $moyenne = 0;
+    $nbRates = 0;
+    $rates = getAllAdvertRate($idAdvertisement);
+    foreach ($rates as $rate) 
+    {
+        $moyenne += $rate{"rating"};
+        $nbRates ++;
+    }
+    if($moyenne!==0){
+        $moyenne = $moyenne/$nbRates;
+    }
+    return $moyenne;
 }
 
 /**
@@ -441,9 +515,9 @@ function showResearchAdvert($word)
     $research = researchAdvert($word);
 
     if(!empty($research)){
-    echo '<table class="table text-center">
-    <thead style="background-color: #1e281e">
-    <tr class="text-light">
+    echo '<table class="table table-hover">
+    <thead>
+    <tr>
       <th scope="col"> Image </th>
       <th scope="col"> Titre </th>
       <th scope="col"> Description </th>
@@ -460,7 +534,7 @@ function showResearchAdvert($word)
     
     foreach ($research as $r){
         echo '<tr>
-                  <td><img class="card-img-top"alt="' . $r['path'] . '" src="./uploads/' . $r['path'] . '"></td> 
+                  <td style="width: 250px;"><img class="card-img-top"alt="' . $r['path'] . '" src="./uploads/' . $r['path'] . '"></td> 
                   <td>' . $r['title'] . '</td> 
                   <td>' . $r['description'] . '</td>';
                   if($r['organic'] == ORGANIC){
@@ -468,15 +542,16 @@ function showResearchAdvert($word)
                   }else{
                     echo '<td>Pas Bio</td>';
                   }
-            echo '<td></td>
-                  <td></td>
+            echo '<td>'.getRateNumber($r['idAdvertisement']).'</td>
+                  <td>'.getRatesMoyenne($r['idAdvertisement']).'/5</td>
                   <td>' . $r['city'].' / '. $r['canton'] . '</td>
-                  <td><a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $r['idAdvertisement'] . '"> <i class="fas fa-info-circle"></i></a></td>
+                  <td><a class="nav-link" href="detailsAdvert.php?idAdvertisement='. $r['idAdvertisement'] . '"> <i class="fas fa-info-circle"style="color: #1e281e;"></i></a></td>
                   </tr>';
         }
-        }
+        echo '<tbody></table>';
+    }
         else{
-            echo '<h1>Aucun résultat</h1>';
+            echo '<h1 class="text-center">Aucun résultat</h1>';
         }
     }
 
@@ -489,9 +564,9 @@ function showAllAdvertsNotValid()
 {
     $db = EDatabase::getInstance();
 
-    echo '<table class="table text-center">
-          <thead style="background-color: #1e281e">
-          <tr class="text-light">
+    echo '<table class="table table-hover">
+          <thead>
+          <tr>
             <th scope="col"> Image </th>
             <th scope="col"> Titre </th>
             <th scope="col"> Description </th>
@@ -510,8 +585,8 @@ function showAllAdvertsNotValid()
             on u.iduser = a.iduser
         INNER JOIN picture p
             on a.idAdvertisement = p.idAdvertisement WHERE a.isValid = 1;') as $row) {
-            echo '<tr>
-                  <td><img class="card-img-top"alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
+            echo '<form method="post" action=""><tr>
+                  <td style="width: 250px;"><img class="img-fluid" alt="' . $row['path'] . '" src="./uploads/' . $row['path'] . '"></td> 
                   <td>' . $row['title'] . '</td> 
                   <td>' . $row['description'] . '</td>';
                   if($row['organic'] == ORGANIC){
@@ -520,24 +595,20 @@ function showAllAdvertsNotValid()
                     echo '<td>Pas Bio</td>';
                   }
             echo '<td>' . $row['city'].' / '. $row['canton'] . '</td>
-                  <td>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="isValid" name="isValid">
-                    </div>
-                  </td>
-                  </tr>';
+                    <td><input class="form-control btn text-light" type="submit" value="Valider" name="validatedAdvert"><input type="hidden" value="'.$row['idAdvertisement'].'" name="idAdvertisement"></td>
+                  </tr></form>';
+                  
         }
 
     } catch (PDOException $ex) {
         echo 'An Error occured!'; // user friendly message
         error_log($ex->getMessage());
     }
-
-    echo '</table>';
+    echo '<tbody></table>';
 }
 
 /**
- * Fonction qui affiche tout les annonces non-validés
+ * Fonction qui affiche tout les utilisateurs
  *
  * @return void
  */
@@ -545,9 +616,9 @@ function showAllUsers()
 {
     $db = EDatabase::getInstance();
 
-    echo '<table class="table text-center">
-          <thead style="background-color: #1e281e">
-          <tr class="text-light">
+    echo '<table class="table table-hover">
+          <thead>
+          <tr>
             <th scope="col"> Email </th>
             <th scope="col"> Description </th>
             <th scope="col"> Admin </th>
@@ -558,15 +629,15 @@ function showAllUsers()
 
     try {
         foreach ($db->query('SELECT idUser, email, description, isAdmin FROM user;') as $row) {
-            echo '<tr>
+            echo '<form method="post" action=""><tr>
                   <td>' . $row['email'] . '</td> 
                   <td>' . $row['description'] . '</td>';
                   if($row['isAdmin'] == ADMIN){
-                    echo '<td><input type="radio" name="isAdmin'.$row['idUser'].'" checked ></td>';
+                    echo '<td><input class="form-control btn-danger btn" type="submit" value="Admin -> User" name="adminToUser"><input type="hidden" value="'.$row['idUser'].'" name="idUser"></td>';
                      }else{
-                   echo '<td><input type="radio" name="isAdmin'.$row['idUser'].'"></td>';
+                   echo '<td><input class="form-control btn text-light" type="submit" value="User -> Admin" name="userToAdmin"><input type="hidden" value="'.$row['idUser'].'" name="idUser"></td>';
                  }
-                  echo '</tr>';
+                  echo '</tr></form>';
         }
 
     } catch (PDOException $ex) {
@@ -574,9 +645,16 @@ function showAllUsers()
         error_log($ex->getMessage());
     }
 
-    echo '</table>';
+    echo '<tbody></table>';
 }
 
+/**
+ * Fonction qui permet de valider une annonce par l'administrateur
+ *
+ * @param [type] $idAdvertisement
+ * @param [type] $isValid
+ * @return void
+ */
 function validedAdvert($idAdvertisement, $isValid) {
     $db = EDatabase::getInstance();
     try {
@@ -587,11 +665,18 @@ function validedAdvert($idAdvertisement, $isValid) {
         error_log($ex->getMessage());
 }}
 
-
+/**
+ * Fonction qui permet de modifier les privilèges des utilistateurs par l'administrateur
+ *
+ * @param [type] $idUser
+ * @param [type] $isAdmin
+ * @return void
+ */
 function updatePrivilegeUser($idUser, $isAdmin) {
         $db = EDatabase::getInstance();
         try {
-
+            $db->query('UPDATE directproddb.user SET isAdmin = "'.$isAdmin.'" WHERE idUser = "'.$idUser.'"');        
+            header("Location: ./administration.php");
         } catch (PDOException $ex) {
             echo "An Error occured!"; // user friendly message
             error_log($ex->getMessage());

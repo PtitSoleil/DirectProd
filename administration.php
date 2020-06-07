@@ -2,7 +2,7 @@
 /**
  * @description : Page d'administration'
  * @version 1.0.0
- * @since 03.06.20
+ * @since 05.06.20
  * @author Adar Güner
  */
 
@@ -12,14 +12,29 @@ if(!isLogged()) {
     header("Location: ./index.php");
 }
 
-if(isset($_POST['isValid'])){
+$validatedAdvert = filter_input(INPUT_POST,"validatedAdvert");
+$adminToUser = filter_input(INPUT_POST,"adminToUser");
+$userToAdmin = filter_input(INPUT_POST,"userToAdmin");
 
-    $idAdvertisement=saluz;
+if ($validatedAdvert) 
+{
+    $idAdvertisement = filter_input(INPUT_POST,"idAdvertisement",FILTER_VALIDATE_INT);
     $isValid = VALID;
+    validedAdvert($idAdvertisement, $isValid);
+}
 
-    //validedAdvert($idAdvertisement, $isValid);
+if ($adminToUser) 
+{
+    $idUser = filter_input(INPUT_POST,"idUser",FILTER_VALIDATE_INT);
+    $isAdmin = USER;
+    updatePrivilegeUser($idUser, $isAdmin);
+}
 
-    echo "SALUT";
+if ($userToAdmin) 
+{
+    $idUser = filter_input(INPUT_POST,"idUser",FILTER_VALIDATE_INT);
+    $isAdmin = ADMIN;
+    updatePrivilegeUser($idUser, $isAdmin);
 }
 
 ?>
@@ -43,16 +58,20 @@ if(isset($_POST['isValid'])){
         <div class="container mt-5">
             <div class="row">
                 <div class="col-12">
-                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Gestion des annonces et utilisateurs</h4></div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-6">
-                                    <?php showAllAdvertsNotValid() ?>
-                                </div>
-                                <div class="col-6">
-                                    <?php showAllUsers() ?>
-                                </div>
-                            </div>                            
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Gestion des utilisateurs</h4></div>
+                        <div class="card-body p-0 m-0">
+                            <?php showAllUsers() ?>                         
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container container-fluid mt-2">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Gestion des annonces</h4></div>
+                        <div class="card-body p-0 m-0">
+                            <?php showAllAdvertsNotValid() ?>                        
                         </div>
                     </div>
                 </div>

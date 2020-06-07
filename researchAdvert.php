@@ -2,7 +2,7 @@
 /**
  * @description : Page d'accueil
  * @version 1.0.0
- * @since 03.06.20
+ * @since 05.06.20
  * @author Adar Güner
  */
 
@@ -55,11 +55,16 @@ if (filter_has_var(INPUT_POST, 'word')) {
             </div>
         </div>
 
-        <div class="container mt-2 text-center">
-            <?php if($word !== ""){
-                showResearchAdvert($word);
-                }
-            ?>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card-header text-light" style="background-color: #1e281e"><h4>Résultat(s)</h4></div>
+                        <div class="card-body p-0 m-0">
+                            <?php showResearchAdvert($word); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 

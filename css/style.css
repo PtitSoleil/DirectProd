@@ -1,3 +1,4 @@
+
 .card-body{
     border: 1px solid #1e281e;
 }
@@ -11,6 +12,15 @@
     background-color: #c81e32
 }
 
-table{
-    border: 1px solid #1e281e;
+.table {
+    margin-bottom: 0px;
+}
+
+.table td,th 
+{
+    text-align: center;   
+}  
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th 
+{
+    background-color: #CECECE;
 }

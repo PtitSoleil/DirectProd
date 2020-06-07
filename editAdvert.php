@@ -2,7 +2,7 @@
 /**
  * @description : Page d'accueil
  * @version 1.0.0
- * @since 03.06.20
+ * @since 05.06.20
  * @author Adar Güner
  */
 
@@ -28,6 +28,20 @@ if (filter_has_var(INPUT_POST, 'modifyAdvert')) {
     $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
     $organic = NOT_ORGANIC;
     $isValid = INVALID;
+    $fichiers = $_FILES['imgFile'];
+
+    if($fichiers['error']<=0) {
+        $tmpName = $_FILES['imgFile']['tmp_name'];
+        $fileName = $_FILES['imgFile']['name'];
+        $fileName = preg_replace('/[^a-z0-9\.\-]/ i','',$fileName);
+        $splitName = explode(".", $fileName);
+        $newName = uniqid();
+        $finalFileName = $newName . "." . $splitName[1];
+        move_uploaded_file($tmpName,'./uploads/'.$finalFileName);
+        unlink("./uploads/".$advertisement['path']);
+    }else{
+        $finalFileName = $advertisement['path'];
+    }
 
     if (empty($title)) {
         $errors["title"] = "Le titre est vide";
@@ -45,11 +59,14 @@ if (filter_has_var(INPUT_POST, 'modifyAdvert')) {
     }
 
     if (empty($errors) ) {        
-            updateAdvert($idAdvertisement, $title, $description, $organic, $isValid);
+        updateAdvert($idAdvertisement, $title, $description, $organic, $isValid, $finalFileName);
         
     }
 }
 if (filter_has_var(INPUT_POST, 'deleteAdvert')) {
+    if($advertisement['path'] !== "noImage.png"){
+        unlink("./uploads/".$advertisement['path']);
+    }
     deleteAdvert($idAdvertisement);   
 }
 
@@ -97,6 +114,11 @@ if (filter_has_var(INPUT_POST, 'deleteAdvert')) {
                                     <input type="checkbox" class="form-check-input" id="organic" name="organic">
                                     <?php endif; ?>
                                     <label class="form-check-label" for="organic">Bio</label>
+                                </div>
+                                <div class="custom-file mt-2 mb-2">
+                                    <input type="hidden" name="MAX_FILE_SIZE" value="3000000">
+                                    <input class="custom-file-input" type="file" name="imgFile" id="imgFile" accept="image/*">
+                                    <label class="custom-file-label" for="imgFile" aria-describedby="inputGroupFileAddon02">Choisissez une image</label>
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" name="modifyAdvert" class="form-control btn text-light">Modifier l'annonce</button>

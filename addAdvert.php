@@ -2,7 +2,7 @@
 /**
  * @description : Page d'accueil
  * @version 1.0.0
- * @since 03.06.20
+ * @since 05.06.20
  * @author Adar Güner
  */
 

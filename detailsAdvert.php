@@ -2,7 +2,7 @@
 /**
  * @description : Détails d'une annonce
  * @version 1.0.0
- * @since 27.05.20
+ * @since 05.06.20
  * @author Adar Güner
  */
 
@@ -21,6 +21,17 @@ if (filter_has_var(INPUT_POST, 'evaluateAdvert')) {
 
     if (empty($comment)) {
         $errors["comment"] = "Le commentaire est vide";
+    }
+    if (empty($note)) {
+        $errors["note"] = "La note est vide";
+    }
+
+    if ($note <= 0) {
+        $errors["note"] = "La note est plus petit ou égale à 0";
+    }
+
+    if ($note > 5) {
+        $errors["note"] = "La note est plus grand que 5";
     }
 
     if (empty($errors) ) {        
@@ -50,17 +61,29 @@ if (filter_has_var(INPUT_POST, 'evaluateAdvert')) {
         <div class="container mt-5">
             <div class="row">
                 <div class="col-12">
-                    <div class="card-header text-light" style="background-color: #1e281e"><h1><?php echo $advertisement['title'] ?></h1></div>
+                    <div class="card-header text-light" style="background-color: #1e281e"><h1 class="text-left"><?php echo $advertisement['title'] ?></h1></div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-4">
                                 <img class="card-img-top" alt="<?php echo $advertisement['path'] ?>" src="./uploads/<?php echo $advertisement['path'] ?>">
                             </div>
-                            <div class="col-8">
+                            <div class="col-6">
                                 <div class="row">
                                     <div class="col">
                                         <label for="description"><h4>Description</h4></label>
                                         <p class="card-text"><?php echo $advertisement['description'] ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="description"><h4>Producteur</h4></label>
+                                        <p class="card-text"><?php echo explode("@", $advertisement['email'])[0] ?></p>
+                                        <label for="description"><h4>Ville / Canton</h4></label>
+                                        <p class="card-text"><?php echo $advertisement['city'] ?> / <?php echo $advertisement['canton'] ?></p>
+                                        <label for="description"><h4>Etat</h4></label>
+                                        <p class="card-text"><?php if($advertisement['organic'] == ORGANIC){ echo "Bio"; }else{echo "Pas Bio";} ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -84,7 +107,10 @@ if (filter_has_var(INPUT_POST, 'evaluateAdvert')) {
                                 </div>
                                 <div class="form-group">
                                     <label for="note">Note</label>
-                                    <input type="number" id="note" name="note" min="0" max="5">
+                                    <input type="number" class="form-control" id="note" name="note" min="0" max="5">
+                                    <div class="invalid-feedback">
+                                        <?= !empty($errors['note']) ? $errors['note'] : '' ?>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" name="evaluateAdvert" class="form-control btn text-light">Evaluer l'annonce</button>
@@ -103,7 +129,7 @@ if (filter_has_var(INPUT_POST, 'evaluateAdvert')) {
                 <div class="col-12">
                     <div class="card-header text-light" style="background-color: #1e281e"><h4>Commentaire</h4></div>
                         <div class="card-body">
-                            <?php showRate($idAdvertisement) ?>
+                            <?php showRates($idAdvertisement) ?>
                         </div>
                     </div>
                 </div>
