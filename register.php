@@ -98,7 +98,7 @@ if (filter_has_var(INPUT_POST, 'register')) {
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label for="email">Addresse mail</label>
+                                        <label for="email">Adresse mail</label>
                                         <input type="email" class="form-control <?= !empty($errors['email']) ? 'is-invalid' : '' ?>" id="email" name="email" aria-describedby="emailHelp" placeholder="Entrer votre email">
                                         <div class="invalid-feedback">
                                             <?= !empty($errors['email']) ? $errors['email'] : '' ?>

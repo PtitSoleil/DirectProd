@@ -117,7 +117,7 @@ function createAdvert($title, $description, $organic, $isValid, $idUser, $finalF
 }
 
 /**
- * Fonction qui affiche tout les annonces validés
+ * Fonction qui affiche toutes les annonces validés
  *
  * @return void
  */
@@ -174,7 +174,7 @@ function showAllAdverts()
 }
 
 /**
- * Fonction qui affiche tout les annonces personnelles
+ * Fonction qui affiche toutes les annonces personnelles
  *
  * @return void
  */
@@ -321,7 +321,7 @@ function showDetailsAdvert($idAdvertisement) {
 }
 
 /**
- * Fonctio qui créer un avis pour une annonce
+ * Fonction qui créer un avis pour une annonce
  *
  * @param [type] $note              Note de l'annonce
  * @param [type] $comment           Son commentaire
@@ -353,7 +353,8 @@ function showRates($idAdvertisement) {
         foreach ($db->query('SELECT r.rating, r.comment, r.date, r.idUser, r.idAdvertisement, u.email
         FROM rate r
         INNER JOIN user u
-            on r.iduser = u.iduser;') as $row) {
+            on r.iduser = u.iduser
+            ORDER BY r.date desc;') as $row) {
             if($row['idAdvertisement'] == $idAdvertisement){
                 echo '<div class="row mb-1" style="border-bottom: 1px solid #1e281e;">
                         <div class="col-10">
@@ -374,7 +375,7 @@ function showRates($idAdvertisement) {
 }
 
 /**
- * Fonction qui permet d'avoir le nombre d'avis d'une annonce
+ * Fonction qui permet d'avoir le nombre des avis d'une annonce
  *
  * @param [type] $idAdvertisement   id de l'annonce
  * @return void
@@ -449,7 +450,7 @@ function showDetailsUser($idUser) {
 }}
 
 /**
- * Modifie un utilisateur dans la base
+ * Modifie l'tilisateur dans la base
  *
  * @param [type] $password          Le mot de passe
  * @param [type] $email             L'addresse email
@@ -506,7 +507,7 @@ function researchAdvert($word)
 }
 
 /**
- * Fonction qui affiche tout les annonces
+ * Fonction qui affiche toutes les annonces
  *
  * @return void
  */
@@ -556,7 +557,7 @@ function showResearchAdvert($word)
     }
 
 /**
- * Fonction qui affiche tout les annonces non-validés
+ * Fonction qui affiche toutes les annonces non-validés
  *
  * @return void
  */
